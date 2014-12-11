@@ -41,7 +41,7 @@ Features
 Installation
 ------------
 
-``bash
+```bash
 > apt-get install python-networkx python-scipy python-numpy
 > git clone git://github.com/panisson/pymobility.git
 > cd pymobility

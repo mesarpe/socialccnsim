@@ -58,6 +58,7 @@ Using virtualenv:
 > easy_install numpy
 > easy_install scipy
 > easy_install pyparsing
+> easy_install pymobility
 > git clone https://github.com/mesarpe/socialccnsim.git
 > cd socialccnsim
 ```

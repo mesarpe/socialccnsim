@@ -41,13 +41,25 @@ Features
 Installation
 ------------
 
+Typical Ubuntu installation:
 ```bash
-> apt-get install python-networkx python-scipy python-numpy
+> apt-get install python-networkx python-scipy python-numpy python-pyparsing
 > git clone git://github.com/panisson/pymobility.git
 > cd pymobility
 > python setup.py install (run as admin/root)
 > cd ..
+```
+
+Using virtualenv:
+```bash
+> virtualenv .
+> source bin/activate
+> easy_install networkx
+> easy_install numpy
+> easy_install scipy
+> easy_install pyparsing
 > git clone https://github.com/mesarpe/socialccnsim.git
+> cd socialccnsim
 ```
 
 Dependencies

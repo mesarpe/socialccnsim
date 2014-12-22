@@ -15,4 +15,5 @@ class LCEDGE(CacheManager):
         # In case, content is found in the first element, we don't cache it again.
         if i != 0:
             self.stats.incr_accepted(self.caches[path[0]].store(interest))
-        self.stats.hops_walked(i, len(path)-1)
+
+        return i

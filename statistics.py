@@ -60,6 +60,9 @@ class Stats():
         self._hops_walked = 0
         self._hops_hits = 0
 
+        # number of requests issued by end-users satisfied by caches
+        self._w = 0
+
         self.accepted = 0
         self.rejected = 0
         self.lock.release()
@@ -73,6 +76,10 @@ class Stats():
     def miss(self):
         self.lock.acquire()
         self._miss+=1
+        self.lock.release()
+    def incr_w(self):
+        self.lock.acquire()
+        self._w += 1
         self.lock.release()
     def incr_interest(self):
         self.lock.acquire()
@@ -164,7 +171,7 @@ class Stats():
         #print "Hit: %d. Miss: %d. Global Cache Hit: %2f"%(self._hit, self._miss, self._hit/float(self._miss+self._hit))
         #print "Interest: %d. Published Data: %d"%(self._interest, self._publish)
         #Just global hit        
-        print self.get_cache_hit(), self.get_stretch(), self.get_hops_reduction(), self.get_diversity(caches), self.get_caching_operations(), self.get_eviction_operations()
+        print self.get_cache_hit(), self.get_stretch(), self.get_hops_reduction(), self.get_diversity(caches), self.get_caching_operations(), self.get_eviction_operations(), self._w, self._interest
 
     def comparison_against_ip_summary(self):
         #mathematical approximation

@@ -64,4 +64,5 @@ class SEMANTIC(CacheManager):
             else:
                 self.stats.miss()
                 self.stats.incr_accepted(self.caches[p].store(interest))
-        self.stats.hops_walked(i, len(path)-1)
+
+        return i

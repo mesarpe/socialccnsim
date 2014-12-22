@@ -15,4 +15,5 @@ class LCD(CacheManager):
                 self.stats.miss()
         if i + 1 == len(path):
             self.stats.incr_accepted(self.caches[p].store(interest))
-        self.stats.hops_walked(i, len(path)-1)
+
+        return i

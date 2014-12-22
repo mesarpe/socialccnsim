@@ -15,4 +15,5 @@ class PROBCACHE(CacheManager):
                 # Cache with a probability inversily proportional to the distance from the requester.
                 if random.randint(0, i) == 0:
                     self.stats.incr_accepted(self.caches[p].store(interest))
-        self.stats.hops_walked(i, len(path)-1)
+
+        return i

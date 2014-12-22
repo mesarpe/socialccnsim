@@ -14,7 +14,8 @@ class CACHELESS(CacheManager):
             else:
                 self.stats.miss()
                 #stats.incr_accepted(self.caches[p].store(interest))
-        self.stats.hops_walked(i, len(path)-1)
+
+        res = i
         
         #Cache in the node with the biggest central betweenness in the path
         max_v = -1
@@ -26,3 +27,5 @@ class CACHELESS(CacheManager):
                 node = p
         
         self.stats.incr_accepted(self.caches[node].store(interest))
+
+        return res

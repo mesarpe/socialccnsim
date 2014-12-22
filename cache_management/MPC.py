@@ -29,4 +29,4 @@ class MPC(CacheManager):
                     self.stats.incr_accepted(self.caches[n].store(interest))
                 self.mpc[p][interest] = 0
                 
-        self.stats.hops_walked(i, len(path)-1)
+        return i

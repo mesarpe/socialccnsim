@@ -1,10 +1,10 @@
 #
+from cache_manager import CacheManager
+import networkx
 
 class CACHELESS(CacheManager):
     def _init_strategy(self):
-        self.central_betweenness = networkx.algorithms.centrality.betweenness_centrality(topology)
-    def _post_production(self):
-        pass
+        self.central_betweenness = networkx.algorithms.centrality.betweenness_centrality(self.topology)
     def retrieve_from_caches(self, interest, path):
         for i in range(0, len(path)):
             p = path[i]

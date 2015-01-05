@@ -247,7 +247,7 @@ class Executor(object):
             # Retrieve content and calculate statistics
             self.lock.acquire()
             h = self.caches.retrieve_from_caches(interest, path)
-            self.stats.hops_walked(h, len(path)-1)
+            self.caches.stats.hops_walked(h, len(path)-1)
             self.lock.release()
 
     def consumer(self, social_issuer, position):
@@ -280,7 +280,7 @@ class Executor(object):
 
                 self.lock.acquire()
                 h = self.caches.retrieve_from_caches(interest, path)
-                self.stats.hops_walked(h, len(path)-1)
+                self.caches.stats.hops_walked(h, len(path)-1)
                 self.lock.release()
 
     def get_expired_elements(self):

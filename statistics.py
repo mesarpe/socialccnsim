@@ -43,7 +43,7 @@ class GeneralStats():
         self.lock.release()
     def summary(self):
         self.lock.acquire()
-        print numpy.average(self._cache_hit), numpy.average(self._stretch), numpy.average(self._hops_reduction), numpy.average(self.expired_elements), numpy.average(self.diversity), numpy.average(self.acceptance_ratio), numpy.std(self._cache_hit), numpy.std(self._stretch), numpy.std(self._hops_reduction), numpy.std(self.expired_elements), numpy.std(self.diversity), numpy.std(self.acceptance_ratio)
+        print numpy.average(self._cache_hit), numpy.average(self._stretch), numpy.average(self._hops_reduction), numpy.average(self.expired_elements), numpy.average(self.diversity), numpy.average(self.acceptance_ratio), numpy.average(self._w), numpy.average(self._interest), numpy.std(self._cache_hit), numpy.std(self._stretch), numpy.std(self._hops_reduction), numpy.std(self.expired_elements), numpy.std(self.diversity), numpy.std(self.acceptance_ratio), numpy.std(self._w), numpy.std(self._interest)
         #print numpy.std(self._cache_hit), numpy.std(self._stretch), numpy.std(self._hops_reduction)
         self.lock.release()
             

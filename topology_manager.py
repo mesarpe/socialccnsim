@@ -25,6 +25,7 @@ import numpy
 
 import networkx
 import os
+import pickle
 
 #import percache
 #cache = percache.Cache("/tmp/my-cache")
@@ -46,7 +47,6 @@ class Paths(object):
 class SocialPaths(Paths):
     def __init__(self, _topology):
         Paths.__init__(self, _topology)
-        self._social_graph = _social_graph
         self._path = {}
 
         # All against all
@@ -90,7 +90,7 @@ class TopologyManager(object):
             self.paths = pickle.load(open('graphs/'+self.topology_file+'.routes', 'rb'))
         else:
             self.paths = SocialPaths(self.topology)
-            pickle.dump(a, open('graphs/'+self.topology_file+'.routes', 'wb'))
+            pickle.dump(self.paths, open('graphs/'+self.topology_file+'.routes', 'wb'))
 
     def get_path(self, social_src, social_dst):
         return self.paths.calculate_path(self.topology_nodes[social_src], self.topology_nodes[social_dst])

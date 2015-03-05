@@ -24,6 +24,7 @@ import random
 import numpy
 
 import networkx
+import os
 
 #import percache
 #cache = percache.Cache("/tmp/my-cache")
@@ -43,8 +44,7 @@ class Paths(object):
         return networkx.shortest_path(self._topology ,source=_source,target=_target)
 
 class SocialPaths(Paths):
-    def __init__(self, _topology, _social_graph, mapping_converter):
-        assert type(mapping_converter) == TopologyManager
+    def __init__(self, _topology):
         Paths.__init__(self, _topology)
         self._social_graph = _social_graph
         self._path = {}
@@ -67,7 +67,7 @@ class SocialPaths(Paths):
 
 
 class TopologyManager(object):
-    def __init__(self, topology, social_graph, topology_nodes_position, enable_mobility = False):
+    def __init__(self, topology, social_graph, topology_nodes_position, enable_mobility = False, topology_file=None):
         assert type(topology_nodes_position) == dict
 
         self.topology = topology
@@ -82,10 +82,15 @@ class TopologyManager(object):
         self.topology_nodes = {}
 
         self.method = None
+        self.topology_file = topology_file
         self.initialize_paths()
 
     def initialize_paths(self):
-        self.paths = SocialPaths(self.topology, self.social_graph, self.topology_nodes)
+        if os.path.exists('graphs/'+self.topology_file+'.routes'):
+            self.paths = pickle.load(open('graphs/'+self.topology_file+'.routes', 'rb'))
+        else:
+            self.paths = SocialPaths(self.topology)
+            pickle.dump(a, open('graphs/'+self.topology_file+'.routes', 'wb'))
 
     def get_path(self, social_src, social_dst):
         return self.paths.calculate_path(self.topology_nodes[social_src], self.topology_nodes[social_dst])

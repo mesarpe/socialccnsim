@@ -39,7 +39,7 @@ import logging
 logging.basicConfig(filename='example.log',level=logging.DEBUG)
 
 class Executor(object):
-    def __init__(self, social_graph, topology, cache_size, caching_strategy, cache_policy, sequence_filename = '', mobility_enabled = False, step_printing = []):
+    def __init__(self, social_graph, topology, cache_size, caching_strategy, cache_policy, sequence_filename = '', mobility_enabled = False, step_printing = [], topology_file = None):
         self.lock = threading.Lock()
         self.condition = threading.Condition()
         
@@ -63,7 +63,7 @@ class Executor(object):
                     random.randint(0, 100),
                     random.randint(0, 100)
             )
-        self.topology_nodes = TopologyManager(topology, social_graph, topology_coords, mobility_enabled)
+        self.topology_nodes = TopologyManager(topology, social_graph, topology_coords, mobility_enabled, topology_file = topology_file)
         self.topology_nodes.set_method('random')
         for user in social_graph.nodes():
             self.topology_nodes.update_user_position(
@@ -361,7 +361,7 @@ if __name__ == '__main__':
         # Import Topology Graph
         petersen = getattr(__import__('graphs.%s'%TOPOLOGY_GRAPH), TOPOLOGY_GRAPH).G
         
-        executor = Executor(G, petersen, CACHE_SIZE, CACHING_STRATEGY, CACHE_STRUCTURE, SEQUENCE_FILE, MOBILITY_ENABLED, STEP_PRINTING)
+        executor = Executor(G, petersen, CACHE_SIZE, CACHING_STRATEGY, CACHE_STRUCTURE, SEQUENCE_FILE, MOBILITY_ENABLED, STEP_PRINTING, topology_file=TOPOLOGY_GRAPH)
         executor.run()
         
         print executor.printStats()

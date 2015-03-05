@@ -39,7 +39,7 @@ import logging
 logging.basicConfig(filename='example.log',level=logging.DEBUG)
 
 class Executor(object):
-    def __init__(self, social_graph, topology, cache_size, caching_strategy, cache_policy, sequence_filename = '', mobility_enabled = False):
+    def __init__(self, social_graph, topology, cache_size, caching_strategy, cache_policy, sequence_filename = '', mobility_enabled = False, step_printing = []):
         self.lock = threading.Lock()
         self.condition = threading.Condition()
         
@@ -48,6 +48,12 @@ class Executor(object):
         self.conf['caching_strategy'] = caching_strategy
         self.conf['cache_policy'] = cache_policy
         self.conf['sequence_from_file'] = sequence_filename != ''
+
+        self.conf['step_printing'] = step_printing
+        if self.conf['step_printing'] != None:
+            self.steps = 0
+        else:
+            self.steps = None
 
         # The topology manager handles user connection to CCN nodes.
         topology_coords = {}
@@ -131,6 +137,12 @@ class Executor(object):
         while line != '': #Empty line, we reach the end of the sequence
             result = re.match ("(?P<timestamp>[0-9]*\.[0-9]+)\t(?P<activity>Retrieve|Publish|retrieve|publish|Retrievecontent|Publishcontent)\t(?P<user>[0-9]+)\t\((?P<dependent>.*)\)\t\((?P<mobility_x>[0-9\.]*), ?(?P<mobility_y>[0-9\.]*)\)", line)
             if result != None:
+
+                #print step result
+                if self.steps != None and self.steps < len(self.conf['printing_steps']) and float(result.group('timestamp')) > self.conf['printing_steps'][self.steps]:
+                    self.sched.enter(self.seq_n * 0.01, 0, self.printStepSummary, ())
+                    self.steps += 1
+                
                 pos = (float(result.group('mobility_x')), float(result.group('mobility_y')))
                 if result.group('activity').lower() in ['publishcontent', 'publish']:
                     self.sched.enter(self.seq_n * 0.01, 0, self.producer2, (int(result.group('user')), pos, "/content/%s"%result.group('dependent').split(',')[0] ))
@@ -290,7 +302,9 @@ class Executor(object):
     def get_diversity(self):
         return self.stats.get_diversity(self.caches)
     def printStats(self):
-        self.caches.stats_summary()
+        return self.caches.stats_summary()
+    def printStepSummary(self):
+        return "=> {0}".format(self.caches.stats.summary())
     def finishSimulation(self):
         self.lock.acquire()
         self.lock.release()
@@ -319,6 +333,12 @@ if __name__ == '__main__':
     except IndexError:
         MOBILITY_ENABLED = False
 
+    try:
+        STEP_PRINTING = [float(x) for x in sys.argv[8].split(",")]
+    except IndexError:
+        STEP_PRINTING = []
+
+
     CACHE_STRUCTURE = re.match('([a-zA-Z0-9_]*(\((?P<params>([0-9]*\.?[0-9]*,? ?)*)\))?)', CACHE_STRUCTURE)
     assert CACHE_STRUCTURE != None
     CACHE_STRUCTURE = CACHE_STRUCTURE.group(1)
@@ -332,9 +352,9 @@ if __name__ == '__main__':
         # Import Topology Graph
         petersen = getattr(__import__('graphs.%s'%TOPOLOGY_GRAPH), TOPOLOGY_GRAPH).G
         
-        executor = Executor(G, petersen, CACHE_SIZE, CACHING_STRATEGY, CACHE_STRUCTURE, SEQUENCE_FILE, MOBILITY_ENABLED)
+        executor = Executor(G, petersen, CACHE_SIZE, CACHING_STRATEGY, CACHE_STRUCTURE, SEQUENCE_FILE, MOBILITY_ENABLED, STEP_PRINTING)
         executor.run()
         
-        executor.printStats()
+        print executor.printStats()
 
 

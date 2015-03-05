@@ -43,9 +43,10 @@ class GeneralStats():
         self.lock.release()
     def summary(self):
         self.lock.acquire()
-        print numpy.average(self._cache_hit), numpy.average(self._stretch), numpy.average(self._hops_reduction), numpy.average(self.expired_elements), numpy.average(self.diversity), numpy.average(self.acceptance_ratio), numpy.average(self._w), numpy.average(self._interest), numpy.std(self._cache_hit), numpy.std(self._stretch), numpy.std(self._hops_reduction), numpy.std(self.expired_elements), numpy.std(self.diversity), numpy.std(self.acceptance_ratio), numpy.std(self._w), numpy.std(self._interest)
+        res = "{0} {1} {2} {3} {4} {5} {6} {7} {8} {9} {10} {11} {12} {13} {14} {15}".format(numpy.average(self._cache_hit), numpy.average(self._stretch), numpy.average(self._hops_reduction), numpy.average(self.expired_elements), numpy.average(self.diversity), numpy.average(self.acceptance_ratio), numpy.average(self._w), numpy.average(self._interest), numpy.std(self._cache_hit), numpy.std(self._stretch), numpy.std(self._hops_reduction), numpy.std(self.expired_elements), numpy.std(self.diversity), numpy.std(self.acceptance_ratio), numpy.std(self._w), numpy.std(self._interest))
         #print numpy.std(self._cache_hit), numpy.std(self._stretch), numpy.std(self._hops_reduction)
         self.lock.release()
+        return res
             
 class Stats():
     def __init__(self):
@@ -171,7 +172,8 @@ class Stats():
         #print "Hit: %d. Miss: %d. Global Cache Hit: %2f"%(self._hit, self._miss, self._hit/float(self._miss+self._hit))
         #print "Interest: %d. Published Data: %d"%(self._interest, self._publish)
         #Just global hit        
-        print self.get_cache_hit(), self.get_stretch(), self.get_hops_reduction(), self.get_diversity(caches), self.get_caching_operations(), self.get_eviction_operations(), self._w, self._interest
+        res = "{0} {1} {2} {3} {4} {5} {6} {7}".format(self.get_cache_hit(), self.get_stretch(), self.get_hops_reduction(), self.get_diversity(caches), self.get_caching_operations(), self.get_eviction_operations(), self._w, self._interest)
+        return res
 
     def comparison_against_ip_summary(self):
         #mathematical approximation

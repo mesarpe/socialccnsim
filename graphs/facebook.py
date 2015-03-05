@@ -1,4 +1,5 @@
 import networkx
+import os
 
 def generate_facebook_graph(filename):
     # We generate the Facebook graph offere at http://snap.stanford.edu/data/egonets-Facebook.html
@@ -56,10 +57,14 @@ def generate_facebook_graph(filename):
     
 #generate_facebook_graph('facebook.gml')
 
-GG = networkx.read_gml('graphs/facebook.gml')
+if not os.path.exists('graphs/facebook.pickle'):
+    GG = networkx.read_gml('graphs/facebook.gml')
 
-G=networkx.Graph()
-for n,nbrs in GG.adjacency_iter():
-   for nbr,edict in nbrs.items():
-       G.add_edge(n,nbr)
+    G=networkx.Graph()
+    for n,nbrs in GG.adjacency_iter():
+       for nbr,edict in nbrs.items():
+           G.add_edge(n,nbr)
+    networkx.write_pickle(G, 'graphs/facebook.pickle')
+else:
+    G = networkx.read_pickle('graphs/facebook.pickle')
 

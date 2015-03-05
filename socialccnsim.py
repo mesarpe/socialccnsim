@@ -329,14 +329,19 @@ if __name__ == '__main__':
 
     try:
         MOBILITY_ENABLED = (sys.argv[7] == 'with_mobility')
-        logging.debug("Mobility enabled")
+        if MOBILITY_ENABLED:
+            logging.debug("Mobility enabled")
+        else:
+            logging.debug("Mobility disabled")
     except IndexError:
         MOBILITY_ENABLED = False
 
     try:
         STEP_PRINTING = [float(x) for x in sys.argv[8].split(",")]
+        logging.debug("Step printing activated")
     except IndexError:
         STEP_PRINTING = []
+        logging.debug("Step printing not activated")
 
 
     CACHE_STRUCTURE = re.match('([a-zA-Z0-9_]*(\((?P<params>([0-9]*\.?[0-9]*,? ?)*)\))?)', CACHE_STRUCTURE)

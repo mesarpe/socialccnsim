@@ -56,6 +56,7 @@ class Executor(object):
             self.steps = None
 
         # The topology manager handles user connection to CCN nodes.
+        logging.debug('Topology manager, connect users started')
         topology_coords = {}
         for node in topology.nodes():
             topology_coords[node] = (
@@ -71,7 +72,7 @@ class Executor(object):
             )
         self.topology_nodes.update_all_users_position()
 
-        logging.debug("topology manager updated")
+        logging.debug('Topology manager, connect users finished')
         
         self.social_graph = social_graph
         self.topology = topology
@@ -80,6 +81,8 @@ class Executor(object):
         self.users = {}
         for user in self.social_graph.nodes():
             self.users[user] = User(user)
+
+        logging.debug('Start simulation')
 
         self.sched = sched.scheduler(time.time, time.sleep)
 
@@ -139,7 +142,7 @@ class Executor(object):
             if result != None:
 
                 #print step result
-                if self.steps != None and self.steps < len(self.conf['printing_steps']) and float(result.group('timestamp')) > self.conf['printing_steps'][self.steps]:
+                if self.steps != None and self.steps < len(self.conf['step_printing']) and float(result.group('timestamp')) > self.conf['step_printing'][self.steps]:
                     self.sched.enter(self.seq_n * 0.01, 0, self.printStepSummary, ())
                     self.steps += 1
                 
@@ -304,7 +307,7 @@ class Executor(object):
     def printStats(self):
         return self.caches.stats_summary()
     def printStepSummary(self):
-        print "=> {0}".format(self.caches.stats.summary())
+        print "=> {0} {1}".format(self.conf['step_printing'][self.steps], self.caches.stats.summary())
     def finishSimulation(self):
         self.lock.acquire()
         self.lock.release()
@@ -350,6 +353,7 @@ if __name__ == '__main__':
 
     # Import Social Graph
     G = getattr(__import__('graphs.%s'%SOCIAL_GRAPH), SOCIAL_GRAPH).G
+    logging.debug('Social Graph loaded')
 
     #random.seed(10442)
 

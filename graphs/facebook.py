@@ -64,7 +64,7 @@ if not os.path.exists('graphs/facebook.pickle'):
     for n,nbrs in GG.adjacency_iter():
        for nbr,edict in nbrs.items():
            G.add_edge(n,nbr)
-    networkx.write_pickle(G, 'graphs/facebook.pickle')
+    networkx.write_gpickle(G, 'graphs/facebook.pickle')
 else:
-    G = networkx.read_pickle('graphs/facebook.pickle')
+    G = networkx.read_gpickle('graphs/facebook.pickle')
 

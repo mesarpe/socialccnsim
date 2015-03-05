@@ -304,7 +304,7 @@ class Executor(object):
     def printStats(self):
         return self.caches.stats_summary()
     def printStepSummary(self):
-        return "=> {0}".format(self.caches.stats.summary())
+        print "=> {0}".format(self.caches.stats.summary())
     def finishSimulation(self):
         self.lock.acquire()
         self.lock.release()

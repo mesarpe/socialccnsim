@@ -105,6 +105,9 @@ class Stats():
         self._hops_walked += hops_walked
         if hops_walked < distance:
             self._hops_hits += hops_walked
+			self._w += 1
+        elif hops_walked == distance:
+            self._hops_hist += hops_walked
         elif hops_walked > distance:
             assert hops_walked > distance
         self._distance += distance

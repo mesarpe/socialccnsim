@@ -36,7 +36,10 @@ import numpy
 
 import logging
 
-logging.basicConfig(filename='example.log',level=logging.DEBUG)
+logging.basicConfig(filename='example.log',
+    level=logging.DEBUG,
+    format='%(asctime)-15s %(clientip)s %(user)-8s %(message)s'
+)
 
 class Executor(object):
     def __init__(self, social_graph, topology, cache_size, caching_strategy, cache_policy, sequence_filename = '', mobility_enabled = False, step_printing = [], topology_file = None):
@@ -143,7 +146,7 @@ class Executor(object):
 
                 #print step result
                 if self.steps != None and self.steps < len(self.conf['step_printing']) and float(result.group('timestamp')) > self.conf['step_printing'][self.steps]:
-                    self.sched.enter(self.seq_n * 0.01, 0, self.printStepSummary, ())
+                    self.sched.enter(self.seq_n * 0.01, 0, self.printStepSummary, (self.conf['step_printing'][self.steps],))
                     self.steps += 1
                 
                 pos = (float(result.group('mobility_x')), float(result.group('mobility_y')))
@@ -306,8 +309,8 @@ class Executor(object):
         return self.stats.get_diversity(self.caches)
     def printStats(self):
         return self.caches.stats_summary()
-    def printStepSummary(self):
-        print "=> {0} {1}".format(self.conf['step_printing'][self.steps], self.caches.stats.summary())
+    def printStepSummary(self, timestamp):
+        print "=> {0} {1}".format(timestamp, self.caches.stats_summary())
     def finishSimulation(self):
         self.lock.acquire()
         self.lock.release()

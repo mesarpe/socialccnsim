@@ -38,7 +38,7 @@ import logging
 
 logging.basicConfig(filename='example.log',
     level=logging.DEBUG,
-    format='%(asctime)-15s %(clientip)s %(user)-8s %(message)s'
+    format='%(asctime)-15s %(message)s'
 )
 
 class Executor(object):

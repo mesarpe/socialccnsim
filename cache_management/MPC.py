@@ -15,11 +15,10 @@ class MPC(CacheManager):
             except:
                 self.mpc[p][interest] = 1
 
-            if self.caches[p].lookup(interest):
-                self.stats.hit()
+            if self.lookup_cache(p, interest):
                 break
             else:
-                self.stats.miss()
+                pass
 
             if self.mpc[p][interest] >= 2:
                 #if i == 0:

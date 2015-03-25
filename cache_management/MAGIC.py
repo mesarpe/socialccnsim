@@ -53,11 +53,9 @@ class MAGIC(CacheManager):
         for i in range(0, len_path):
             p = path[i]
             
-            if self.caches[p].lookup(interest):
-                self.stats.hit()
+            if self.lookup_cache(p, interest):
                 break
             else:
-                self.stats.miss()
                 # if the cache is not filled or we store 
                 if len(self.caches[p]) < self.CACHE_SIZE:
                     self.stats.incr_accepted(self.caches[p].store(interest))

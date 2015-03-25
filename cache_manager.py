@@ -111,6 +111,16 @@ class CacheManager(object):
         """Function to be overloaded"""
         raise Exception('This function should never be called: retrieve_from_caches')
 
+    def lookup_cache(self, node, interest):
+        """Wrapper to lookup in the caches
+        """
+        res = self.caches[p].lookup(interest):
+        if res:
+            self.stats.hit()
+        else:
+            self.stats.miss()
+        return res
+
     #REFACTORING OF THIS!
     def incr_publish(self):
         return self.stats.incr_publish()

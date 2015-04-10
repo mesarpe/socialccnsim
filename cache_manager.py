@@ -27,6 +27,13 @@ import externmodules.community
 
 from statistics import Stats, GeneralStats
 
+import logging
+
+logging.basicConfig(filename='example.log',
+    level=logging.DEBUG,
+    format='%(asctime)-15s %(message)s'
+)
+
 class CacheManager(object):
     def _init_strategy(self):
         pass
@@ -92,7 +99,8 @@ class CacheManager(object):
         ### END REPLACEMENT POLICIES ##########################################
         rp = getattr(getattr(__import__('replacement_policies.%s'%self.cache_policy), self.cache_policy), self.cache_policy)
         for node in self.topology.nodes():
-            self.caches[node] = rp(cache_size)#, self.cache_policy_params)
+            if self.topology_manager.has_caching_capabilities(node):
+                self.caches[node] = rp(cache_size)#, self.cache_policy_params)
 
     def post_production(self, content_name, social_publisher):
         self._post_production(content_name, social_publisher)
@@ -107,19 +115,38 @@ class CacheManager(object):
         return self.caches.values()
 
     #TODO: change function name
-    def retrieve_from_caches(self, interest, path):
-        """Function to be overloaded"""
-        raise Exception('This function should never be called: retrieve_from_caches')
+    def _retrieve_from_caches(self, interest, path):
+        res = self.retrieve_from_caches(interest, path)
+        # Move to _retrieve_from_caches
+        if res[0]:
+            self.stats.incr_w()
+            logging.info("Resolved interest(%s) with %s, path(%s): hit request into node %s of the topology"%(self.__class__.__name__, interest, path, path[res[1]]))
+        else:
+            logging.info("Resolved interest(%s) with %s,  path(%s): miss request"%(self.__class__.__name__, interest, path))
+
+        self.stats.hops_walked(res[1], len(path)-1)
+        
 
     def lookup_cache(self, node, interest):
         """Wrapper to lookup in the caches
         """
-        res = self.caches[p].lookup(interest):
-        if res:
-            self.stats.hit()
+        if self.topology_manager.has_caching_capabilities(node):
+            res = self.caches[node].lookup(interest)
+            if res:
+                self.stats.hit()
+            else:
+                self.stats.miss()
         else:
-            self.stats.miss()
+            res = False
         return res
+    def store_cache(self, node, interest):
+        if self.topology_manager.has_caching_capabilities(node):
+            self.stats.incr_accepted(self.caches[node].store(interest))
+
+    def print_caches(self):
+        logging.debug('Inspection of the caches')
+        for k in self.caches.keys():
+            logging.debug("Cache in Node(%s): %s"%(k, [k for k in self.caches[k].keys()]))
 
     #REFACTORING OF THIS!
     def incr_publish(self):
@@ -127,5 +154,6 @@ class CacheManager(object):
     def incr_interest(self):
         return self.stats.incr_interest()
     def stats_summary(self):
+        self.print_caches()
         return self.stats.summary(self.caches)
 

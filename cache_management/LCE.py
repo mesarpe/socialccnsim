@@ -1,5 +1,11 @@
 #
 from cache_manager import CacheManager
+import logging
+
+logging.basicConfig(filename='example.log',
+    level=logging.DEBUG,
+    format='%(asctime)-15s %(message)s'
+)
 
 class LCE(CacheManager):
     def __init__(self, cache_policy, cache_size, social_graph, topology, topology_manager, threshold = None):
@@ -7,11 +13,15 @@ class LCE(CacheManager):
     def _init_strategy(self):
         pass
     def retrieve_from_caches(self, interest, path):
+        
+        content_found_caches = False
+
         for i in range(0, len(path)):
             p = path[i]
             if self.lookup_cache(p, interest):
+                content_found_caches = True
                 break
             else:
-                self.stats.incr_accepted(self.caches[p].store(interest))
+                self.store_cache(p, interest)
 
-        return i
+        return (content_found_caches, i)

@@ -1,13 +1,16 @@
 #
+import networkx
+import numpy
 from cache_manager import CacheManager
 from cache_management.LCE import LCE
 
 class SACSPAGERANK(LCE):
-    def _init_strategy(self):
+    def __init__(self, cache_policy, cache_size, social_graph, topology, topology_manager, threshold = None):
+        super(SACSPAGERANK, self).__init__(cache_policy, cache_size, social_graph, topology, topology_manager, threshold)
         self.pagerank = networkx.algorithms.link_analysis.pagerank_alg.pagerank(social_graph)
         self.threshold = numpy.average(self.pagerank.values())
 
-    def _post_production(self, content_name, social_publisher, paths):
+    def _post_production(self, content_name, social_publisher):
         if self.pagerank[social_publisher] > self.threshold:
             # In all the cache path
             for social_neighbour in self.social_graph.neighbors(social_publisher):
@@ -15,5 +18,5 @@ class SACSPAGERANK(LCE):
                             social_publisher,
                             social_neighbour
                 )
-                [self.stats.incr_accepted(self.caches[p].store(content_name)) for p in path]
+                [self.store_cache(p, content_name) for p in path]
 

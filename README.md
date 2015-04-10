@@ -74,7 +74,7 @@ Execute the trace test_trace in a CCN network with abilene as topology and Leave
 LRU is used as replacement policy,
 Links acquaintances among simulated users is represented with a graph of a Facebook social network.
 ```bash
-> python socialccnsim.py 10 lce abilene facebook lru test_trace
+> python -O socialccnsim.py 2 lce facebook abilene lru exampletrace/verysmall
 ```
 
 Contributing

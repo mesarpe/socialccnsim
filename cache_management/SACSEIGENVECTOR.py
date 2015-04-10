@@ -1,9 +1,11 @@
 #
 from cache_management.LCE import LCE
 import networkx.algorithms.centrality
+import numpy
 
 class SACSEIGENVECTOR(LCE):
-    def _init_strategy(self):
+    def __init__(self, cache_policy, cache_size, social_graph, topology, topology_manager, threshold = None):
+        super(SACSEIGENVECTOR, self).__init__(cache_policy, cache_size, social_graph, topology, topology_manager, threshold)
         self.eigenvector = networkx.algorithms.centrality.eigenvector_centrality(social_graph)
         self.threshold = numpy.average(self.eigenvector.values())
     def _post_production(self, content_name, social_publisher):
@@ -14,5 +16,5 @@ class SACSEIGENVECTOR(LCE):
                             social_publisher,
                             social_neighbour
                 )
-                [self.stats.incr_accepted(self.caches[p].store(content_name)) for p in path]
+                [self.store_cache(p, content_name) for p in path]
 

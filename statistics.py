@@ -137,9 +137,11 @@ class Stats():
         total_elements = 0
         diff_elements = set()
         for cache in caches.values():
-            for content_name in cache:
+            for content_name in cache.keys():
                 diff_elements.add(content_name)
-            total_elements+=len(cache)
+                total_elements+=1
+        if total_elements == 0:
+            return 0
         return len(diff_elements)/float(total_elements)
 
     def get_caching_operations(self):
@@ -151,7 +153,10 @@ class Stats():
         return self.accepted
     def get_cache_hit(self):
         self.lock.acquire()
-        res = self._hit/float(self._miss+self._hit)
+        try:
+            res = self._hit/float(self._miss+self._hit)
+        except ZeroDivisionError:
+            res = 0.0
         self.lock.release()
         return res
     def get_stretch(self):
@@ -164,22 +169,22 @@ class Stats():
         return res
     def get_hops_reduction(self):
         self.lock.acquire()
-        if self._hops_walked == 0:
-            res = 0
+        if self._distance == 0:
+            res = 0.0
         else:
-            res = self._hops_hits/float(self._hops_walked)
+            res = 1 - self._hops_walked/float(self._distance)
         self.lock.release()
         return res
+    def get_rch(self):
+        """
+        Get Request Cache Hit
+        """
+        try:
+            return round(float(self._w)/self._interest, 4)
+        except ZeroDivisionError:
+            return 0
 
     def summary(self, caches):
-        #print "Hit: %d. Miss: %d. Global Cache Hit: %2f"%(self._hit, self._miss, self._hit/float(self._miss+self._hit))
-        #print "Interest: %d. Published Data: %d"%(self._interest, self._publish)
-        #Just global hit        
-        res = "{0} {1} {2} {3} {4} {5} {6} {7}".format(self.get_cache_hit(), self.get_stretch(), self.get_hops_reduction(), self.get_diversity(caches), self.get_caching_operations(), self.get_eviction_operations(), self._w, self._interest)
+        res = "{0} {1} {2} {3} {4} {5} {6} {7} {8}".format(round(self.get_cache_hit(), 4), round(self.get_stretch(), 4), round(self.get_hops_reduction(), 4), round(self.get_diversity(caches), 4), self.get_caching_operations(), self.get_eviction_operations(), self._w, self._interest, self.get_rch())
         return res
-
-    def comparison_against_ip_summary(self):
-        #mathematical approximation
-        hops_route_std = 3
-        print "%d, %d"%(hops_route_std*self._interest*2, self._miss+self._hit)
 

@@ -6,15 +6,16 @@ class CACHELESS(CacheManager):
     def _init_strategy(self):
         self.central_betweenness = networkx.algorithms.centrality.betweenness_centrality(self.topology)
     def retrieve_from_caches(self, interest, path):
+        content_found_caches = False
+
         for i in range(0, len(path)):
             p = path[i]
             if self.lookup_cache(p, interest):
+                content_found_caches = True
                 break
             else:
                 pass
-                #stats.incr_accepted(self.caches[p].store(interest))
 
-        res = i
         
         #Cache in the node with the biggest central betweenness in the path
         max_v = -1
@@ -25,6 +26,6 @@ class CACHELESS(CacheManager):
                 max_v = self.central_betweenness[p]
                 node = p
         
-        self.stats.incr_accepted(self.caches[node].store(interest))
+        self.store_cache(node, interest)
 
-        return res
+        return (content_found_caches, i)

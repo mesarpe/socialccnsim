@@ -76,7 +76,14 @@ class TopologyManager(object):
         self.enable_mobility = enable_mobility
         
         #Coordinates for the nodes and the users
-        self.coords = topology_nodes_position
+        #First: filter nodes without caching capabilities
+        tnp = {}
+        for n in topology_nodes_position.keys():
+            if self.has_request_capabilities(n):
+               tnp = topology_nodes_position[n]
+        topology_nodes_position = None 
+
+        self.coords = tnp
         self.coords_user = {}
 
         self.topology_nodes = {}
@@ -113,11 +120,13 @@ class TopologyManager(object):
         return self.topology_nodes[user]
 
     def update_all_users_position(self):
+        #TODO: add feature that users only can be putted in a node without the wr attribute as true
+
         if self.method == 'random':
+            request_nodes = [n for n in self.topology.nodes() if self.has_request_capabilities(n)]
             res = []
             for user in self.social_graph.nodes():
-                self.topology_nodes[user] = random.choice(self.topology.nodes())
-
+                self.topology_nodes[user] = random.choice(request_nodes)
 
         elif self.method == 'geographical':
             for user in self.social_graph.nodes():
@@ -147,6 +156,13 @@ class TopologyManager(object):
                 n = k
         assert n != -1, "Remember to set original coordinates for CCN nodes. User %s found closest node the -1"%user
         return n
+
+    def has_caching_capabilities(self, node):
+        n = self.topology.node[node]
+        return not (n.has_key('wc') and n['wc'] == True)
+    def has_request_capabilities(self, node):
+        n = self.topology.node[node]
+        return not (n.has_key('wr') and n['wr'] == True)
 
     def __getitem__(self, key):
         return self.get_user_node(key)

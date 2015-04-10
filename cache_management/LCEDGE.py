@@ -5,14 +5,22 @@ from cache_manager import CacheManager
 
 class LCEDGE(CacheManager):
     def retrieve_from_caches(self, interest, path):
+        content_found_caches = False
+
         for i in range(0, len(path)):
             p = path[i]
             if self.lookup_cache(p, interest):
+                content_found_caches = True
                 break
             else:
                 pass
-        # In case, content is found in the first element, we don't cache it again.
-        if i != 0:
-            self.stats.incr_accepted(self.caches[path[0]].store(interest))
 
-        return i
+        # In anycase, we put a copy in the first cacheable element
+        first = 0
+        while first < len(path)-1 and not self.topology_manager.has_caching_capabilities(path[first]):
+            first += 1
+        if first < i: #Only if the element is placed before the original requester
+            self.store_cache(path[first], interest)
+            
+
+        return (content_found_caches, i)

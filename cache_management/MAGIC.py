@@ -9,6 +9,7 @@ class MAGIC(CacheManager):
             self.r_m_v[node]['sum'] = 0
 
     def retrieve_from_caches(self, interest, path):
+        content_found_caches = False
         len_path = len(path)
     
         max_gain = 0
@@ -54,14 +55,15 @@ class MAGIC(CacheManager):
             p = path[i]
             
             if self.lookup_cache(p, interest):
+                content_found_caches = True
                 break
             else:
                 # if the cache is not filled or we store 
                 if len(self.caches[p]) < self.CACHE_SIZE:
-                    self.stats.incr_accepted(self.caches[p].store(interest))
+                    self.store_cache(p, interest)
                 elif max_gain_index == i:
                     self.caches[p].remove(rep_penalty[p])
-                    self.stats.incr_accepted(self.caches[p].store(interest))
+                    self.store_cache(p, interest)
         
         
-        return i
+        return (content_found_caches, i)

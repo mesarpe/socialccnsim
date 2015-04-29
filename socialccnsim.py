@@ -37,7 +37,7 @@ import numpy
 import logging
 
 logging.basicConfig(filename='example.log',
-    level=logging.DEBUG,
+    level=logging.CRITICAL,
     format='%(asctime)-15s %(message)s'
 )
 
@@ -247,7 +247,6 @@ class Executor(object):
     def consume_from_server(self, social_issuer, position, content_name):
         #print "consume_from_server %s"%content_name
         self.topology_nodes.update_user_position(social_issuer, position)
-        self.caches.incr_interest()
 
         content_retrieved = {}
         last = 0
@@ -269,7 +268,6 @@ class Executor(object):
 
     def consumer(self, social_issuer, position):
         self.topology_nodes.update_user_position(social_issuer, position)
-        self.caches.incr_interest()
 
         content_retrieved = {}
     

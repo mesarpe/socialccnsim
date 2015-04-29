@@ -30,7 +30,7 @@ from statistics import Stats, GeneralStats
 import logging
 
 logging.basicConfig(filename='example.log',
-    level=logging.DEBUG,
+    level=logging.CRITICAL,
     format='%(asctime)-15s %(message)s'
 )
 
@@ -116,6 +116,7 @@ class CacheManager(object):
 
     #TODO: change function name
     def _retrieve_from_caches(self, interest, path):
+        self.stats.incr_interest()
         res = self.retrieve_from_caches(interest, path)
         # Move to _retrieve_from_caches
         if res[0]:
@@ -151,8 +152,6 @@ class CacheManager(object):
     #REFACTORING OF THIS!
     def incr_publish(self):
         return self.stats.incr_publish()
-    def incr_interest(self):
-        return self.stats.incr_interest()
     def stats_summary(self):
         self.print_caches()
         return self.stats.summary(self.caches)

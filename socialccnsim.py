@@ -166,7 +166,7 @@ class Executor(object):
 
     
     def initialize_catalog(self):
-        self.f = tempfile.NamedTemporaryFile(delete=True)
+        self.f = tempfile.NamedTemporaryFile(delete=True, dir='/data/tmp/')
         self.conn = sqlite3.connect(self.f.name)
 
         self.c = self.conn.cursor()

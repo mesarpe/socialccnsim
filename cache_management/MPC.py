@@ -3,6 +3,8 @@ from cache_manager import CacheManager
 
 class MPC(CacheManager):
     MPC_THRESHOLD = 10
+    RESET_VALUE = 0
+    
     def _init_strategy(self):
         self.mpc = {}
         for node in self.topology.nodes():
@@ -33,6 +35,6 @@ class MPC(CacheManager):
             for n in neighbors:
                 if self.topology_manager.has_caching_capabilities(n):
                     self.store_cache(n, interest)
-            self.mpc[p][interest] = 0
+            self.mpc[p][interest] = self.RESET_VALUE
                 
         return (content_found_caches, i)

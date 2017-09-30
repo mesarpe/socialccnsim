@@ -2,6 +2,7 @@
 from cache_manager import CacheManager
 
 class MPC(CacheManager):
+    MPC_THRESHOLD = 10
     def _init_strategy(self):
         self.mpc = {}
         for node in self.topology.nodes():
@@ -24,12 +25,14 @@ class MPC(CacheManager):
             else:
                 self.stats.miss()
 
-            if content_found_caches and self.mpc[p][interest] >= 1:
+        if not content_found_caches:
+            self.store_cache(path[len(path)-1], interest)
+        if content_found_caches and self.mpc[p][interest] >= self.MPC_THRESHOLD:
 
-                neighbors = self.topology_manager.topology.neighbors(p)
-                for n in neighbors:
-                    if self.caching_capabilities(n):
-                        self.store_cache(n, interest)
-                self.mpc[p][interest] = 0
+            neighbors = self.topology_manager.topology.neighbors(p)
+            for n in neighbors:
+                if self.topology_manager.has_caching_capabilities(n):
+                    self.store_cache(n, interest)
+            self.mpc[p][interest] = 0
                 
         return (content_found_caches, i)

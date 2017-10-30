@@ -77,6 +77,11 @@ Links acquaintances among simulated users is represented with a graph of a Faceb
 > python -O socialccnsim.py 2 lce facebook abilene lru exampletrace/verysmall
 ```
 
+Common Asked Questions
+----------------------
+Q. How do I change the cache size per node?
+A. Set the first parameter (i.e. 2 in the example) to the desired cache size per node.
+
 Contributing
 ------------
 If you have a Github account please fork the repository,

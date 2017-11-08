@@ -3,7 +3,7 @@ SocialCCNSim
 
 Description
 -----------
-SocialCCNSim is a discrete-event simulator of a CCN network.
+SocialCCNSim is a discrete-event trace executor of a CCN network.
 
 Features
 --------
@@ -77,10 +77,15 @@ Links acquaintances among simulated users is represented with a graph of a Faceb
 > python -O socialccnsim.py 2 lce facebook abilene lru exampletrace/verysmall
 ```
 
-Common Asked Questions
-----------------------
+Frequently Asked Questions
+--------------------------
 Q. How do I change the cache size per node?
+
 A. Set the first parameter (i.e. 2 in the example) to the desired cache size per node.
+
+Q. How do I change the popularity properties of the trace?
+
+A. Socialccnsim executes synthetic traces. If you want to create traces with special properties (special parameters), you are encouraged to give it a visit to SONETOR [https://github.com/mesarpe/sonetor]. SONETOR is a synthetic traces generator. With SONETOR, traces can be generated and then executed into Socialccnsim.
 
 Contributing
 ------------

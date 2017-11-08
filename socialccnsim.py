@@ -26,6 +26,8 @@ import tempfile
 import sqlite3
 import sched, time
 import re
+import optparse
+import logging
 
 import threading
 
@@ -118,18 +120,7 @@ class Executor(object):
     def initialize_scheduler(self):
         self.sched = sched.scheduler(time.time, time.sleep)
 
-        if self.conf['sequence_from_file']:
-            self.extract_sequence()
-        else:
-            #TODO: deprecated code
-            t = seq
-            for seq in self.sequence:
-                if(random.randint(0, 12) == 0):
-                    self.sched.enter(t*0.01, 0, self.producer, (self.social_graph.nodes()[seq],(0,0),))
-                
-                self.sched.enter(t*0.01, 1, self.consumer, (self.social_graph.nodes()[seq],(0,0),))
-                t+=1
-            self.sched.enter(t*0.01 + 0.2, 0, self.finishSimulation, ())
+        self.extract_sequence()
 
         assert not self.sched.empty()
 
@@ -315,31 +306,85 @@ class Executor(object):
         self.condition.release()
 
 if __name__ == '__main__':
+    parser = optparse.OptionParser()
+    parser.add_option("-c", "--cache-size-per-node",
+                  dest="cache_size_per_node",
+                  help="space of cache allocated for every node in the topology",
+                  type=int,
+                  )
+    parser.add_option("-s", "--strategy",
+                  dest="caching_strategy",
+                  help="caching Strategy used for evaluating the trace"
+                  )
+    parser.add_option("-u", "--social-connections",
+                  dest="social_graph",
+                  help='social connections between users of the trace. Every trace includes users that executes actions.'
+    )
+    parser.add_option("-t", "--topology",
+                  dest="network_topology",
+                  help='network topology used for executing the trace.'
+    )
+    parser.add_option("-f", "--trace-file",
+                  dest="trace",
+                  default="",
+                  help='the trace to be executed',
+    )
+    parser.add_option("-p", "--replacement-policy",
+                  dest="replacement_policy",
+                  help='replacement policy used at every network node.',
+    )
+    parser.add_option("-m", "--mobility-enabled",
+                  dest="mobility_enabled",
+                  default=False,
+                  action="store_true",
+                  help="Enable mobility of users"
+    )
+    parser.add_option("-d", "--debug",
+                  dest="debug",
+                  default=False,
+                  action="store_true",
+                  help="Enable debugging options"
+    )
+    parser.add_option("-r", "--step-printing",
+                  dest="step_printing",
+                  default="",
+                  help = ""
+    )
 
-    CACHE_SIZE = int(sys.argv[1])
-    CACHING_STRATEGY = sys.argv[2]
+    (options, args) = parser.parse_args()
+
+
+    if options.debug:
+        root = logging.getLogger()
+        root.setLevel(logging.DEBUG)
+
+        ch = logging.StreamHandler(sys.stdout)
+        ch.setLevel(logging.DEBUG)
+        formatter = logging.Formatter('%(asctime)s - %(name)s - %(levelname)s - %(message)s')
+        ch.setFormatter(formatter)
+        root.addHandler(ch)
+        logging.info('Enable Debugging')
+
+    CACHE_SIZE = options.cache_size_per_node
+    CACHING_STRATEGY = options.caching_strategy
     RUNS = 1
-    SOCIAL_GRAPH = sys.argv[3]
-    TOPOLOGY_GRAPH = sys.argv[4]
-    CACHE_STRUCTURE = sys.argv[5]
+    SOCIAL_GRAPH = options.social_graph
+    TOPOLOGY_GRAPH = options.network_topology
+    CACHE_STRUCTURE = options.replacement_policy
+
+    SEQUENCE_FILE = options.trace
+    if SEQUENCE_FILE == "":
+        logging.error("no trace file, using random generation of messages.")
+        exit()
+
+    MOBILITY_ENABLED = options.mobility_enabled
+    if MOBILITY_ENABLED:
+        logging.debug("Mobility enabled")
+    else:
+        logging.debug("Mobility disabled")
 
     try:
-        SEQUENCE_FILE = sys.argv[6]
-    except IndexError:
-        logging.warning("Warning: no trace file, using random generation of messages.")
-        SEQUENCE_FILE = ''
-
-    try:
-        MOBILITY_ENABLED = (sys.argv[7] == 'with_mobility')
-        if MOBILITY_ENABLED:
-            logging.debug("Mobility enabled")
-        else:
-            logging.debug("Mobility disabled")
-    except IndexError:
-        MOBILITY_ENABLED = False
-
-    try:
-        STEP_PRINTING = [float(x) for x in sys.argv[8].split(",")]
+        STEP_PRINTING = [float(x) for x in options.step_printing.split(",") if x != '']
         logging.debug("Step printing activated")
     except IndexError:
         STEP_PRINTING = []
@@ -364,5 +409,4 @@ if __name__ == '__main__':
         executor.run()
         
         print executor.printStats()
-
 
